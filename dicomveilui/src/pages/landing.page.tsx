@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export const LandingPage = () => {
     return (
-        <main className="m-4 grid gap-4 place-items-center">
+        <main className="m-4 grid gap-4 place-items-center dark:bg-black dark:text-white">
             <header className="max-w-lg w-full">
                 <h1 className="text-3xl font-black">Welcome to <span className="text-blue-700">DICOMVeil</span></h1>
                 <h2 className="text-xl">Secure, Efficient, and Reliable DICOM Anonymization.</h2>
