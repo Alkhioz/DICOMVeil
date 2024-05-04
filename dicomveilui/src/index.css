@@ -1,3 +1,78 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    body {
+      @apply bg-black;
+    }
+  }
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+  font-family: "AtkinsonHyperlegible";
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+select,
+textarea,
+input,
+button {
+  font: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+}
+
+@media print {
+  body {
+    font-size: 8pt;
+  }
+}
+
+@font-face {
+  font-family: 'AtkinsonHyperlegible';
+  src: url('/fonts/Atkinson-Hyperlegible-Regular-102.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  src: url("/fonts/Atkinson-Hyperlegible-Bold-102.woff");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  src: url("/fonts/Atkinson-Hyperlegible-Italic-102.woff");
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  src: url("/fonts/Atkinson-Hyperlegible-BoldItalic-102.woff");
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  src: url("/fonts/Atkinson-Hyperlegible-Italic-102.woff");
+  font-style: oblique;
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegible";
+  src: url("/fonts/Atkinson-Hyperlegible-BoldItalic-102.woff");
+  font-weight: bold;
+  font-style: oblique;
+}
