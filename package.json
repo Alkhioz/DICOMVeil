@@ -1,0 +1,24 @@
+{
+  "name": "dicomveil",
+  "version": "1.0.0",
+  "description": "A React based DICOM anonymization tool powered by rust and wasm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alkhioz/DICOMVeil.git"
+  },
+  "keywords": [
+    "wasm",
+    "rust",
+    "DICOM"
+  ],
+  "author": "Alkhioz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alkhioz/DICOMVeil/issues"
+  },
+  "homepage": "https://github.com/Alkhioz/DICOMVeil#readme"
+}
