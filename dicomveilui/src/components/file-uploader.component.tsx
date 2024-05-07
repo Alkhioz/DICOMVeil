@@ -10,15 +10,6 @@ const zipTypes = [
     'application/x-zip-compressed'
 ];
 
-const dicomTypes = [
-    'dcm'
-];
-
-const allowedType = [
-    ...zipTypes,
-    ...dicomTypes,
-];
-
 export const FileUploader = (props: FileUploaderProps) => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleFileInputClick = () => {
@@ -27,8 +18,8 @@ export const FileUploader = (props: FileUploaderProps) => {
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event?.target?.files?.[0];
         if (!file) return false;
-        if(!allowedType.includes(file.type)) return false;
-        if (!zipTypes.includes(file.type)) {
+        if (!(zipTypes.includes(file.type))) {
+            if(!file.name.toLowerCase().endsWith('.dcm')) return false;
             props.addFile(file);
             if (fileInputRef.current) fileInputRef.current.value = '';
             return false;
@@ -38,9 +29,9 @@ export const FileUploader = (props: FileUploaderProps) => {
         contents.forEach(async (_, jsZipObject) => {
             if (!jsZipObject.dir) {
                 const blob = await jsZipObject.async("blob");
-                if(!blob) return false;
+                if (!blob) return false;
                 const file = new File([blob], jsZipObject.name, { type: blob.type });
-                if(!file) return false;
+                if (!file) return false;
                 props.addFile(file);
             }
         });
