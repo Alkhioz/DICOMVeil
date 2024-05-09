@@ -8,8 +8,10 @@ import { fileStatus, useFiles } from "../hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
 import { downloadFileToBrowser } from "../utils/file-download.util";
 import JSZip from 'jszip';
+import { useDicom } from "../hooks/useDicom/useDicom.hook";
 
 export const AnonymizerPage = () => {
+    const { handleAnonymization } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -26,11 +28,18 @@ export const AnonymizerPage = () => {
         });
     }
 
-    const anonymizeFilesHandler = (ids: string[]) => {
+    const anonymizeFilesHandler = async (ids: string[]) => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
-        for (const file of filesToAnonymize) {
-            anonymizeFile(file.index);
+        for (const current of filesToAnonymize) {
+            const anonymizedBuffer = await handleAnonymization(current.file);
+            if(anonymizedBuffer){
+                const anonymizedFile = new Blob([anonymizedBuffer]);
+                anonymizeFile({
+                    index: current.index,
+                    anonymizedFile,
+                });
+            }
         }
     }
 
@@ -39,8 +48,11 @@ export const AnonymizerPage = () => {
         if (!filesToDownload || filesToDownload?.length === 0) return false;
         if(filesToDownload?.length === 1) {
             const current = filesToDownload[0];
-            downloadFileToBrowser(current.file, current.file.name);
-            downloadFile(current.index);
+            const anonymizedFile = current.anonymizedFile;
+            if(anonymizedFile){
+                downloadFileToBrowser(anonymizedFile, current.file.name);
+                downloadFile(current.index);
+            }
             return false;
         }
         const zip = new JSZip();
