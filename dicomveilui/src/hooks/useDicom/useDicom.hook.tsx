@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import init, { modify_patient_name } from './lib/dicom';
+import init, { modify_tag_value, get_tag_value } from './lib/dicom';
 
 export const useDicom = () => {
     const [isWasmReady, setWasmReady] = useState(false);
@@ -11,15 +11,24 @@ export const useDicom = () => {
         loadWasm();
     }, []);
 
-    const handleAnonymization = useCallback(async (file:any) => {
+    const handleSetTagValue = useCallback(async (file: any) => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
-            const result = await modify_patient_name(new Uint8Array(arrayBuffer));
+            const result = await modify_tag_value(new Uint8Array(arrayBuffer));
+            return result;
+        }
+    }, [isWasmReady]);
+
+    const handleGetTagValue = useCallback(async (file: any, tag: string) => {
+        if (file && isWasmReady) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await get_tag_value( new Uint8Array(arrayBuffer), tag);
             return result;
         }
     }, [isWasmReady]);
 
     return {
-        handleAnonymization,
+        handleSetTagValue,
+        handleGetTagValue,
     }
 }

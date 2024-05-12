@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { FileAnonymizer } from "../components/file-anonymizer.component";
 import { FileUploader } from "../components/file-uploader.component";
 import { MainLayout } from "../components/layout/main-layout.component"
@@ -11,7 +11,7 @@ import JSZip from 'jszip';
 import { useDicom } from "../hooks/useDicom/useDicom.hook";
 
 export const AnonymizerPage = () => {
-    const { handleAnonymization } = useDicom();
+    const { handleSetTagValue, handleGetTagValue } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -28,11 +28,20 @@ export const AnonymizerPage = () => {
         });
     }
 
+    useEffect(()=>{
+        if(files?.length>0){
+            files.forEach(async current=>{
+                const name = await handleGetTagValue(current.file, 'PatientName');
+                console.log('PatientName', name);
+            });
+        }
+    }, [files]);
+
     const anonymizeFilesHandler = async (ids: string[]) => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleAnonymization(current.file);
+            const anonymizedBuffer = await handleSetTagValue(current.file);
             if(anonymizedBuffer){
                 const anonymizedFile = new Blob([anonymizedBuffer]);
                 anonymizeFile({
