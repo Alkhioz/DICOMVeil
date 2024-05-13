@@ -10,7 +10,7 @@ const DELETEACTION: u8 = 0;
 const UPDATEACTION: u8 = 1;
 
 #[wasm_bindgen]
-pub fn modify_tag_value(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
+pub fn update_tags(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
     let mods: Vec<Modification> = serde_json::from_str(modifications)
         .map_err(|e| e.to_string())?;
     let cursor = Cursor::new(buffer);
@@ -31,7 +31,7 @@ pub fn modify_tag_value(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, S
 }
 
 #[wasm_bindgen]
-pub fn remove_tag(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
+pub fn remove_tags(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
     let mods: Vec<Modification> = serde_json::from_str(modifications)
         .map_err(|e| e.to_string())?;
     let cursor = Cursor::new(buffer);
@@ -53,7 +53,7 @@ pub fn remove_tag(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String>
 
 
 #[wasm_bindgen]
-pub fn remove_update_tag(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
+pub fn remove_update_tags(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
     let mods: Vec<Modification> = serde_json::from_str(modifications)
         .map_err(|e| e.to_string())?;
     let cursor = Cursor::new(buffer);
@@ -82,7 +82,7 @@ pub fn remove_update_tag(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, 
 }
 
 #[wasm_bindgen]
-pub fn get_tag_value(buffer: &[u8], tags: Vec<String>) -> Result<String, String> {
+pub fn get_tags(buffer: &[u8], tags: Vec<String>) -> Result<String, String> {
     let cursor = Cursor::new(buffer);
     let obj = FileDicomObject::from_reader(cursor)
         .map_err(|e| e.to_string())?;

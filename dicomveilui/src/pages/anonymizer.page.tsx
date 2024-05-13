@@ -12,7 +12,7 @@ import { dicomActionType, useDicom } from "../hooks/useDicom/useDicom.hook";
 import { DicomTagKey } from "../hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
-    const { handleRemoveUpdateTag, handleGetTagValue } = useDicom();
+    const { handleRemoveUpdateTags, handleGetTags } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -33,7 +33,7 @@ export const AnonymizerPage = () => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleRemoveUpdateTag(current.file, [
+            const anonymizedBuffer = await handleRemoveUpdateTags(current.file, [
                 {
                     key: DicomTagKey.PatientName,
                     value: "Anonymized^Test",
@@ -50,7 +50,7 @@ export const AnonymizerPage = () => {
                     index: current.index,
                     anonymizedFile: anonymizedFile,
                 });
-                const data = await handleGetTagValue(anonymizedFile, [
+                const data = await handleGetTags(anonymizedFile, [
                     DicomTagKey.PatientName,
                 ]);
                 console.log('data:', data);

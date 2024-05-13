@@ -132,14 +132,14 @@ function getArrayU8FromWasm0(ptr, len) {
 * @param {string} modifications
 * @returns {Uint8Array}
 */
-export function modify_tag_value(buffer, modifications) {
+export function update_tags(buffer, modifications) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(buffer, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(modifications, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.modify_tag_value(retptr, ptr0, len0, ptr1, len1);
+        wasm.update_tags(retptr, ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -160,14 +160,14 @@ export function modify_tag_value(buffer, modifications) {
 * @param {string} modifications
 * @returns {Uint8Array}
 */
-export function remove_tag(buffer, modifications) {
+export function remove_tags(buffer, modifications) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(buffer, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(modifications, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.remove_tag(retptr, ptr0, len0, ptr1, len1);
+        wasm.remove_tags(retptr, ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -188,14 +188,14 @@ export function remove_tag(buffer, modifications) {
 * @param {string} modifications
 * @returns {Uint8Array}
 */
-export function remove_update_tag(buffer, modifications) {
+export function remove_update_tags(buffer, modifications) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(buffer, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(modifications, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.remove_update_tag(retptr, ptr0, len0, ptr1, len1);
+        wasm.remove_update_tags(retptr, ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -234,7 +234,7 @@ function passArrayJsValueToWasm0(array, malloc) {
 * @param {(string)[]} tags
 * @returns {string}
 */
-export function get_tag_value(buffer, tags) {
+export function get_tags(buffer, tags) {
     let deferred4_0;
     let deferred4_1;
     try {
@@ -243,7 +243,7 @@ export function get_tag_value(buffer, tags) {
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passArrayJsValueToWasm0(tags, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.get_tag_value(retptr, ptr0, len0, ptr1, len1);
+        wasm.get_tags(retptr, ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var r2 = getInt32Memory0()[retptr / 4 + 2];
