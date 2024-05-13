@@ -12,7 +12,7 @@ import { useDicom } from "../hooks/useDicom/useDicom.hook";
 import { DicomTagKey } from "../hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
-    const { handleSetTagValue, handleGetTagValue } = useDicom();
+    const { handleSetTagValue, handleGetTagValue, handleRemoveTag } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -41,14 +41,20 @@ export const AnonymizerPage = () => {
             ]);
             if (anonymizedBuffer) {
                 const anonymizedFile = new Blob([anonymizedBuffer]);
-                anonymizeFile({
-                    index: current.index,
-                    anonymizedFile,
-                });
                 const data = await handleGetTagValue(anonymizedFile, [
                     DicomTagKey.PatientName,
                 ]);
                 console.log('data:', data);
+                const deletedBuffer = await handleRemoveTag(anonymizedFile, [
+                    DicomTagKey.PatientName,
+                ]);
+                if (deletedBuffer) {
+                    const deletedFile = new Blob([deletedBuffer]);
+                    anonymizeFile({
+                        index: current.index,
+                        anonymizedFile: deletedFile,
+                    });
+                }
             }
         }
     }
