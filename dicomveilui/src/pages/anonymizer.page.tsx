@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { FileAnonymizer } from "../components/file-anonymizer.component";
 import { FileUploader } from "../components/file-uploader.component";
 import { MainLayout } from "../components/layout/main-layout.component"
@@ -28,26 +28,25 @@ export const AnonymizerPage = () => {
         });
     }
 
-    useEffect(()=>{
-        if(files?.length>0){
-            files.forEach(async current=>{
-                const name = await handleGetTagValue(current.file, 'PatientName');
-                console.log('PatientName', name);
-            });
-        }
-    }, [files]);
-
     const anonymizeFilesHandler = async (ids: string[]) => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleSetTagValue(current.file);
+            const anonymizedBuffer = await handleSetTagValue(current.file, [
+                {
+                    "group": 16,
+                    "element": 16,
+                    "value": "Anonymized^Test"
+                }
+            ]);
             if(anonymizedBuffer){
                 const anonymizedFile = new Blob([anonymizedBuffer]);
                 anonymizeFile({
                     index: current.index,
                     anonymizedFile,
                 });
+                const name = await handleGetTagValue(anonymizedFile, 'PatientName');
+                console.log('PatientName', name);
             }
         }
     }

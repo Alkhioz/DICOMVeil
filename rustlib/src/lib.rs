@@ -1,20 +1,26 @@
 use wasm_bindgen::prelude::*;
 use std::io::Cursor;
 use dicom_object::FileDicomObject;
-use dicom_dictionary_std::tags;
 use dicom_core::ops::AttributeOp;
 use dicom_core::ops::AttributeAction;
 use dicom_core::ops::ApplyOp;
+use dicom_core::Tag;
 
 #[wasm_bindgen]
-pub fn modify_tag_value(buffer: &[u8]) -> Result<Vec<u8>, String> {
+pub fn modify_tag_value(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, String> {
+    let mods: Vec<Modification> = serde_json::from_str(modifications)
+        .map_err(|e| e.to_string())?;
     let cursor = Cursor::new(buffer);
     let mut obj = FileDicomObject::from_reader(cursor)
         .map_err(|e| e.to_string())?;
-    let _ = obj.apply(AttributeOp::new(
-        tags::PATIENT_NAME,
-        AttributeAction::SetStr("AlejandroMendoza".into()),
-    ));
+    for modif in mods {
+        let tag = Tag(modif.group, modif.element);
+        let _ = obj.apply(AttributeOp::new(
+            tag,
+            AttributeAction::SetStr(modif.value.into()),
+        ))
+        .map_err(|e| e.to_string())?;
+    }
     let mut outbuffer = Vec::new();
     let outcursor = Cursor::new(&mut outbuffer);
     let _ = obj.write_all(outcursor);
@@ -33,4 +39,11 @@ pub fn get_tag_value(buffer: &[u8], tag: String) -> Result<String, String> {
         .map_err(|e| e.to_string())?;
 
     Ok(tag_value.into_owned())
+}
+
+#[derive(serde::Deserialize)]
+struct Modification {
+    group: u16,
+    element: u16,
+    value: String,
 }

@@ -11,3 +11,5 @@ dicom-object = "0.7"
 dicom-dictionary-std = "0.7.0"
 dicom-core = "0.7.0"
 wasm-bindgen = "0.2.80"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

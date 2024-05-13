@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import init, { modify_tag_value, get_tag_value } from './lib/dicom';
 
+type setTagType = {
+    group: number;
+    element: number;
+    value: string;
+}
+
 export const useDicom = () => {
     const [isWasmReady, setWasmReady] = useState(false);
     useEffect(() => {
@@ -11,10 +17,10 @@ export const useDicom = () => {
         loadWasm();
     }, []);
 
-    const handleSetTagValue = useCallback(async (file: any) => {
+    const handleSetTagValue = useCallback(async (file: any, tags: Array<setTagType>) => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
-            const result = await modify_tag_value(new Uint8Array(arrayBuffer));
+            const result = await modify_tag_value(new Uint8Array(arrayBuffer), JSON.stringify(tags));
             return result;
         }
     }, [isWasmReady]);
@@ -22,7 +28,7 @@ export const useDicom = () => {
     const handleGetTagValue = useCallback(async (file: any, tag: string) => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
-            const result = await get_tag_value( new Uint8Array(arrayBuffer), tag);
+            const result = await get_tag_value(new Uint8Array(arrayBuffer), tag);
             return result;
         }
     }, [isWasmReady]);
