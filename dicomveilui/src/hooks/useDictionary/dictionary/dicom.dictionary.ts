@@ -10,6 +10,7 @@ import { numberManipulationUtil } from "../../../utils/number-manipulation.util"
  */
 export enum DicomTagKey {
     PatientName = 'PatientName',
+    PatientBirthDate = 'PatientBirthDate',
 };
 
 /**
@@ -34,6 +35,10 @@ const DICTIONARY: DicomTagReferenceMap = {
     [DicomTagKey.PatientName]: {
         groupHex: '0010',
         elementHex: '0010',
+    },
+    [DicomTagKey.PatientBirthDate]: {
+        groupHex: '0010',
+        elementHex: '0030',
     }
 };
 

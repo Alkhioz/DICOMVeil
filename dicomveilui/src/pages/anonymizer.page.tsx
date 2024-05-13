@@ -8,11 +8,11 @@ import { fileStatus, useFiles } from "../hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
 import { downloadFileToBrowser } from "../utils/file-download.util";
 import JSZip from 'jszip';
-import { useDicom } from "../hooks/useDicom/useDicom.hook";
+import { dicomActionType, useDicom } from "../hooks/useDicom/useDicom.hook";
 import { DicomTagKey } from "../hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
-    const { handleSetTagValue, handleGetTagValue, handleRemoveTag } = useDicom();
+    const { handleRemoveUpdateTag, handleGetTagValue } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -33,28 +33,27 @@ export const AnonymizerPage = () => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleSetTagValue(current.file, [
+            const anonymizedBuffer = await handleRemoveUpdateTag(current.file, [
                 {
                     key: DicomTagKey.PatientName,
-                    value: "Anonymized^Test"
-                }
+                    value: "Anonymized^Test",
+                    type: dicomActionType.UPDATEACTION
+                },
+                {
+                    key: DicomTagKey.PatientBirthDate,
+                    type: dicomActionType.DELETEACTION,
+                },
             ]);
             if (anonymizedBuffer) {
                 const anonymizedFile = new Blob([anonymizedBuffer]);
+                anonymizeFile({
+                    index: current.index,
+                    anonymizedFile: anonymizedFile,
+                });
                 const data = await handleGetTagValue(anonymizedFile, [
                     DicomTagKey.PatientName,
                 ]);
                 console.log('data:', data);
-                const deletedBuffer = await handleRemoveTag(anonymizedFile, [
-                    DicomTagKey.PatientName,
-                ]);
-                if (deletedBuffer) {
-                    const deletedFile = new Blob([deletedBuffer]);
-                    anonymizeFile({
-                        index: current.index,
-                        anonymizedFile: deletedFile,
-                    });
-                }
             }
         }
     }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import init, { modify_tag_value, get_tag_value, remove_tag } from './dicomlib/dicom';
+import init, { modify_tag_value, get_tag_value, remove_tag, remove_update_tag } from './dicomlib/dicom';
 import { useDictionary } from '../useDictionary/useDictionary.hook';
 import { DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.dictionary';
 
@@ -9,34 +9,34 @@ import { DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.diction
  * @property {DicomTagKey} key - The key of the DICOM tag.
  * @property {string} value - The value to be associated with the DICOM tag.
  */
-type tagType = {
+type tagValueType = {
     key: DicomTagKey;
     value: string;
 }
 
-/**
- * Represents a mapped type for a DICOM tag used in DICOM file operations.
- * @typedef {Object} tagTypeMapped
- * @property {number} group - The DICOM tag group number.
- * @property {number} element - The DICOM tag element number.
- * @property {string} value - The value to be associated with the DICOM tag.
- */
+export enum dicomActionType {
+    DELETEACTION = 0,
+    UPDATEACTION = 1,
+}
+
+export type ActionType = {
+    key: DicomTagKey;
+    type: dicomActionType;
+    value?: string;
+}
+
+
 type tagTypeMapped = {
     group: number;
     element: number;
-    value: string;
+    operationtype: number;
 }
 
-/**
- * Represents a mapped type for a DICOM tag used in DICOM file operations.
- * @typedef {Object} tagTypeMapped
- * @property {number} group - The DICOM tag group number.
- * @property {number} element - The DICOM tag element number.
- * @property {string} value - The value to be associated with the DICOM tag.
- */
-type tagDeleteTypeMapped = {
+type tagValueTypeMapped = {
     group: number;
     element: number;
+    operationtype: number;
+    value: string;
 }
 
 /**
@@ -67,19 +67,20 @@ export const useDicom = () => {
      * Handles setting values for specified DICOM tags within a DICOM file.
      * @async
      * @param {any} file - The file object (assumed to be a DICOM file).
-     * @param {Array<tagType>} tags - An array of tag types to set in the DICOM file.
+     * @param {Array<TagValueType>} tags - An array of tag types to set in the DICOM file.
      * @returns {Promise<Uint8Array>} A promise that resolves to the result of the tag modification operation.
      */
-    const handleSetTagValue = useCallback(async (file: any, tags: Array<tagType>) => {
+    const handleSetTagValue = useCallback(async (file: any, tags: Array<tagValueType>) => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
             const result = await modify_tag_value(
                 new Uint8Array(arrayBuffer),
                 JSON.stringify(
-                    tags?.map((tag: tagType): tagTypeMapped => {
+                    tags?.map((tag: tagValueType): tagValueTypeMapped => {
                         return {
                             group: dictionary[tag.key].group,
                             element: dictionary[tag.key].element,
+                            operationtype: dicomActionType.UPDATEACTION,
                             value: tag.value,
                         }
                     })
@@ -101,10 +102,37 @@ export const useDicom = () => {
             const result = await remove_tag(
                 new Uint8Array(arrayBuffer),
                 JSON.stringify(
-                    tags?.map((key: DicomTagKey): tagDeleteTypeMapped => {
+                    tags?.map((key: DicomTagKey): tagTypeMapped => {
                         return {
                             group: dictionary[key].group,
                             element: dictionary[key].element,
+                            operationtype: dicomActionType.DELETEACTION,
+                        }
+                    })
+                )
+            );
+            return result;
+        }
+    }, [isWasmReady]);
+    /**
+     * Handles removal of tags inside a DICOM file.
+     * @async
+     * @param {any} file - The file object (assumed to be a DICOM file).
+     * @param {Array<DicomTagKey>} tags - An array of keys to remove from the DICOM file.
+     * @returns {Promise<Uint8Array>} A promise that resolves to the result of the tag removal operation.
+     */
+    const handleRemoveUpdateTag = useCallback(async (file: any, tags: Array<ActionType>) => {
+        if (file && isWasmReady) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await remove_update_tag(
+                new Uint8Array(arrayBuffer),
+                JSON.stringify(
+                    tags?.map((tag: ActionType): tagValueTypeMapped => {
+                        return {
+                            group: dictionary[tag.key].group,
+                            element: dictionary[tag.key].element,
+                            operationtype: tag.type,
+                            value: tag?.value ?? '',
                         }
                     })
                 )
@@ -119,7 +147,7 @@ export const useDicom = () => {
      * @param {Array<DicomTagKey>} tags - An array of DICOM tag keys to retrieve values for.
      * @returns A promise that resolves to an array of tag types with key and value pairs.
      */
-    const handleGetTagValue = useCallback(async (file: any, tags: Array<DicomTagKey>): Promise<Array<tagType>> => {
+    const handleGetTagValue = useCallback(async (file: any, tags: Array<DicomTagKey>): Promise<Array<tagValueType>> => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
             const result = await get_tag_value(new Uint8Array(arrayBuffer), tags);
@@ -131,6 +159,7 @@ export const useDicom = () => {
     return {
         handleSetTagValue,
         handleRemoveTag,
+        handleRemoveUpdateTag,
         handleGetTagValue,
     }
 }
