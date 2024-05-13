@@ -28,17 +28,27 @@ pub fn modify_tag_value(buffer: &[u8], modifications: &str) -> Result<Vec<u8>, S
 }
 
 #[wasm_bindgen]
-pub fn get_tag_value(buffer: &[u8], tag: String) -> Result<String, String> {
+pub fn get_tag_value(buffer: &[u8], tags: Vec<String>) -> Result<String, String> {
     let cursor = Cursor::new(buffer);
     let obj = FileDicomObject::from_reader(cursor)
         .map_err(|e| e.to_string())?;
+    let mut results = Vec::new();
+    for tag in tags.iter() {
+        let tag_value = obj.element_by_name(&tag)
+            .map_err(|e| e.to_string())?
+            .to_str()
+            .map_err(|e| e.to_string())?;
+        results.push(TagValue { tag: tag.clone(), value: tag_value.into_owned() });
+    }
+    let jsonstring = serde_json::to_string(&results)
+                .map_err(|e| e.to_string());
+    Ok(jsonstring?)
+}
 
-    let tag_value = obj.element_by_name(&tag)
-        .map_err(|e| e.to_string())?
-        .to_str()
-        .map_err(|e| e.to_string())?;
-
-    Ok(tag_value.into_owned())
+#[derive(serde::Serialize)]
+struct TagValue {
+    tag: String,
+    value: String,
 }
 
 #[derive(serde::Deserialize)]

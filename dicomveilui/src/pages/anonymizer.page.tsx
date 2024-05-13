@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { downloadFileToBrowser } from "../utils/file-download.util";
 import JSZip from 'jszip';
 import { useDicom } from "../hooks/useDicom/useDicom.hook";
+import { DicomDictionary } from "../hooks/useDicom/dicomlib/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
     const { handleSetTagValue, handleGetTagValue } = useDicom();
@@ -34,9 +35,9 @@ export const AnonymizerPage = () => {
         for (const current of filesToAnonymize) {
             const anonymizedBuffer = await handleSetTagValue(current.file, [
                 {
-                    "group": 16,
-                    "element": 16,
-                    "value": "Anonymized^Test"
+                    group: DicomDictionary.PatientName.tag.group,
+                    element: DicomDictionary.PatientName.tag.element,
+                    value: "Anonymized^Test"
                 }
             ]);
             if(anonymizedBuffer){
@@ -45,8 +46,10 @@ export const AnonymizerPage = () => {
                     index: current.index,
                     anonymizedFile,
                 });
-                const name = await handleGetTagValue(anonymizedFile, 'PatientName');
-                console.log('PatientName', name);
+                const data = await handleGetTagValue(anonymizedFile, [
+                    DicomDictionary.PatientName.name,
+                ]);
+                console.log('data:', data);
             }
         }
     }
