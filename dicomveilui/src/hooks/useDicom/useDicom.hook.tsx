@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import init, { update_tags, remove_tags, remove_update_tags, get_tags } from './dicomlib/dicom';
 import { useDictionary } from '../useDictionary/useDictionary.hook';
-import { DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.dictionary';
+import { AnonymizationAction, DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.dictionary';
 
 /**
  * Represents a simplified type for a DICOM tag with its key and associated value.
@@ -21,10 +21,8 @@ export enum dicomActionType {
 
 export type ActionType = {
     key: DicomTagKey;
-    type: dicomActionType;
     value?: string;
 }
-
 
 type tagTypeMapped = {
     group: number;
@@ -128,10 +126,13 @@ export const useDicom = () => {
                 new Uint8Array(arrayBuffer),
                 JSON.stringify(
                     tags?.map((tag: ActionType): tagValueTypeMapped => {
+                        const action = dictionary[tag.key].action;
+                        const type = action === AnonymizationAction.REMOVE ?
+                            dicomActionType.DELETEACTION : dicomActionType.UPDATEACTION;
                         return {
                             group: dictionary[tag.key].group,
                             element: dictionary[tag.key].element,
-                            operationtype: tag.type,
+                            operationtype: type,
                             value: tag?.value ?? '',
                         }
                     })

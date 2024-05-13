@@ -8,7 +8,7 @@ import { fileStatus, useFiles } from "../hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
 import { downloadFileToBrowser } from "../utils/file-download.util";
 import JSZip from 'jszip';
-import { dicomActionType, useDicom } from "../hooks/useDicom/useDicom.hook";
+import { useDicom } from "../hooks/useDicom/useDicom.hook";
 import { DicomTagKey } from "../hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
@@ -37,11 +37,9 @@ export const AnonymizerPage = () => {
                 {
                     key: DicomTagKey.PatientName,
                     value: "Anonymized^Test",
-                    type: dicomActionType.UPDATEACTION
                 },
                 {
                     key: DicomTagKey.PatientBirthDate,
-                    type: dicomActionType.DELETEACTION,
                 },
             ]);
             if (anonymizedBuffer) {
