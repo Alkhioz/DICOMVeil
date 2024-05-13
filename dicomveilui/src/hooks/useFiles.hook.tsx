@@ -10,6 +10,7 @@ export type fileElement = {
     file: File,
     index: string,
     status: fileStatus,
+    anonymizedFile?: Blob,
 }
 
 enum actionTypeEnum {
@@ -32,7 +33,10 @@ type removeFileActionType = {
 
 type anonymizeFileActionType = {
     type: actionTypeEnum.ANONYMIZE,
-    payload: string,
+    payload: {
+        index: string,
+        anonymizedFile: Blob,
+    },
 }
 
 type downloadFileActionType = {
@@ -53,7 +57,11 @@ const filesReducer = (state: fileElement[], action: addFileActionType | removeFi
             return state.filter((item) => item.index !== action.payload);
         case actionTypeEnum.ANONYMIZE:
             return state.map((item) =>
-                item.index === action.payload ? { ...item, status: fileStatus.ANONYMIZED } : item
+                item.index === action.payload.index ? {
+                    ...item,
+                    status: fileStatus.ANONYMIZED,
+                    anonymizedFile: action.payload.anonymizedFile,
+                } : item
             );
         case actionTypeEnum.DOWNLOAD:
             return state.map((item) =>
@@ -74,8 +82,10 @@ export const useFiles = () => {
     const removeFile = (index: string) => {
         dispatch({ type: actionTypeEnum.REMOVE, payload: index });
     };
-    const anonymizeFile = (index: string) => {
-        dispatch({ type: actionTypeEnum.ANONYMIZE, payload: index });
+    const anonymizeFile = (
+        payload: { index: string, anonymizedFile: Blob }
+    ) => {
+        dispatch({ type: actionTypeEnum.ANONYMIZE, payload });
     };
     const downloadFile = (index: string) => {
         dispatch({ type: actionTypeEnum.DOWNLOAD, payload: index });
