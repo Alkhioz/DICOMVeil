@@ -1,19 +1,48 @@
 import { useCallback, useEffect, useState } from 'react';
 import init, { modify_tag_value, get_tag_value } from './dicomlib/wasm/dicom';
+import { useDictionary } from '../useDictionary/useDictionary.hook';
+import { DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.dictionary';
 
-type setTagType = {
+/**
+ * Represents a simplified type for a DICOM tag with its key and associated value.
+ * @typedef {Object} tagType
+ * @property {DicomTagKey} key - The key of the DICOM tag.
+ * @property {string} value - The value to be associated with the DICOM tag.
+ */
+type tagType = {
+    key: DicomTagKey;
+    value: string;
+}
+
+/**
+ * Represents a mapped type for a DICOM tag used in DICOM file operations.
+ * @typedef {Object} tagTypeMapped
+ * @property {number} group - The DICOM tag group number.
+ * @property {number} element - The DICOM tag element number.
+ * @property {string} value - The value to be associated with the DICOM tag.
+ */
+type tagTypeMapped = {
     group: number;
     element: number;
     value: string;
 }
 
-type getTagType = {
-    tag: string;
-    value: string;
-}
-
+/**
+ * Custom React hook to manage DICOM tags within a web application.
+ * @returns {Object} An object containing functions to handle setting and getting DICOM tag values.
+ */
 export const useDicom = () => {
+    /**
+     * State to track if the WebAssembly module is ready.
+     */
     const [isWasmReady, setWasmReady] = useState(false);
+    /**
+     * Retrieves a dictionary of DICOM tags currently supported.
+     */
+    const dictionary: Record<DicomTagKey, DicomTag> = useDictionary();
+    /**
+     * Effect to asynchronously load the WebAssembly module.
+     */
     useEffect(() => {
         const loadWasm = async () => {
             await init();
@@ -22,15 +51,39 @@ export const useDicom = () => {
         loadWasm();
     }, []);
 
-    const handleSetTagValue = useCallback(async (file: any, tags: Array<setTagType>) => {
+    /**
+     * Handles setting values for specified DICOM tags within a DICOM file.
+     * @async
+     * @param {any} file - The file object (assumed to be a DICOM file).
+     * @param {Array<tagType>} tags - An array of tag types to set in the DICOM file.
+     * @returns {Promise<Uint8Array>} A promise that resolves to the result of the tag modification operation.
+     */
+    const handleSetTagValue = useCallback(async (file: any, tags: Array<tagType>) => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
-            const result = await modify_tag_value(new Uint8Array(arrayBuffer), JSON.stringify(tags));
+            const result = await modify_tag_value(
+                new Uint8Array(arrayBuffer),
+                JSON.stringify(
+                    tags?.map((tag: tagType): tagTypeMapped => {
+                        return {
+                            group: dictionary[tag.key].group,
+                            element: dictionary[tag.key].element,
+                            value: tag.value,
+                        }
+                    })
+                )
+            );
             return result;
         }
     }, [isWasmReady]);
-
-    const handleGetTagValue = useCallback(async (file: any, tags: Array<string>): Promise<Array<getTagType>> => {
+    /**
+     * Retrieves the values of specified DICOM tags from the provided file.
+     * 
+     * @param {File} file - The DICOM file to read from.
+     * @param {Array<DicomTagKey>} tags - An array of DICOM tag keys to retrieve values for.
+     * @returns A promise that resolves to an array of tag types with key and value pairs.
+     */
+    const handleGetTagValue = useCallback(async (file: any, tags: Array<DicomTagKey>): Promise<Array<tagType>> => {
         if (file && isWasmReady) {
             const arrayBuffer = await file.arrayBuffer();
             const result = await get_tag_value(new Uint8Array(arrayBuffer), tags);
