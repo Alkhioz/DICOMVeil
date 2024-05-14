@@ -3,7 +3,7 @@
  * and converting between hexadecimal and decimal representations of these tags.
  */
 
-import { numberManipulationUtil } from "../../../utils/number-manipulation.util";
+import { numberManipulationUtil } from "@utils/number-manipulation.util";
 
 /**
  * Enumerates DICOM tag keys with their standard names.

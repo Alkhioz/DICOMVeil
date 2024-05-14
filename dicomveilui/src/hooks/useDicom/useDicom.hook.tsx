@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import init, { update_tags, remove_tags, remove_update_tags, get_tags } from './dicomlib/dicom';
-import { useDictionary } from '../useDictionary/useDictionary.hook';
-import { AnonymizationAction, DicomTag, DicomTagKey } from '../useDictionary/dictionary/dicom.dictionary';
+import { useDictionary } from '@hooks/useDictionary/useDictionary.hook';
+import { AnonymizationAction, DicomTag, DicomTagKey } from '@hooks/useDictionary/dictionary/dicom.dictionary';
 
 /**
  * Represents a simplified type for a DICOM tag with its key and associated value.

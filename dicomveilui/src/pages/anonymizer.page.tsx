@@ -1,15 +1,15 @@
 import { useMemo } from "react";
-import { FileAnonymizer } from "../components/file-anonymizer.component";
-import { FileUploader } from "../components/file-uploader.component";
-import { MainLayout } from "../components/layout/main-layout.component"
-import { TripleLayout } from "../components/layout/triple-layout.component";
-import { ProfileConfiguration } from "../components/profile-configuration.component";
-import { fileStatus, useFiles } from "../hooks/useFiles.hook";
+import { FileAnonymizer } from "@components/file-anonymizer.component";
+import { FileUploader } from "@components/file-uploader.component";
+import { MainLayout } from "@components/layout/main-layout.component"
+import { TripleLayout } from "@components/layout/triple-layout.component";
+import { ProfileConfiguration } from "@components/profile-configuration.component";
+import { fileStatus, useFiles } from "@hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
-import { downloadFileToBrowser } from "../utils/file-download.util";
+import { downloadFileToBrowser } from "@utils/file-download.util";
 import JSZip from 'jszip';
-import { useDicom } from "../hooks/useDicom/useDicom.hook";
-import { DicomTagKey } from "../hooks/useDictionary/dictionary/dicom.dictionary";
+import { useDicom } from "@hooks/useDicom/useDicom.hook";
+import { DicomTagKey } from "@hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
     const { handleRemoveUpdateTags, handleGetTags } = useDicom();
