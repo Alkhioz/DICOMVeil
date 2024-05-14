@@ -1,5 +1,5 @@
 import React from "react";
-import { fileElement, fileStatus } from "../hooks/useFiles.hook";
+import { fileElement, fileStatus } from "@hooks/useFiles.hook";
 
 export type FileAnonymizerProps = {
     files: fileElement[];

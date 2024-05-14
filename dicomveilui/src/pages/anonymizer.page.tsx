@@ -1,18 +1,18 @@
 import { useMemo } from "react";
-import { FileAnonymizer } from "../components/file-anonymizer.component";
-import { FileUploader } from "../components/file-uploader.component";
-import { MainLayout } from "../components/layout/main-layout.component"
-import { TripleLayout } from "../components/layout/triple-layout.component";
-import { ProfileConfiguration } from "../components/profile-configuration.component";
-import { fileStatus, useFiles } from "../hooks/useFiles.hook";
+import { FileAnonymizer } from "@components/file-anonymizer.component";
+import { FileUploader } from "@components/file-uploader.component";
+import { MainLayout } from "@components/layout/main-layout.component"
+import { TripleLayout } from "@components/layout/triple-layout.component";
+import { ProfileConfiguration } from "@components/profile-configuration.component";
+import { fileStatus, useFiles } from "@hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
-import { downloadFileToBrowser } from "../utils/file-download.util";
+import { downloadFileToBrowser } from "@utils/file-download.util";
 import JSZip from 'jszip';
-import { useDicom } from "../hooks/useDicom/useDicom.hook";
-import { DicomDictionary } from "../hooks/useDicom/dicomlib/dictionary/dicom.dictionary";
+import { useDicom } from "@hooks/useDicom/useDicom.hook";
+import { DicomTagKey } from "@hooks/useDictionary/dictionary/dicom.dictionary";
 
 export const AnonymizerPage = () => {
-    const { handleSetTagValue, handleGetTagValue } = useDicom();
+    const { handleRemoveUpdateTags, handleGetTags } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -33,21 +33,23 @@ export const AnonymizerPage = () => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleSetTagValue(current.file, [
+            const anonymizedBuffer = await handleRemoveUpdateTags(current.file, [
                 {
-                    group: DicomDictionary.PatientName.tag.group,
-                    element: DicomDictionary.PatientName.tag.element,
-                    value: "Anonymized^Test"
-                }
+                    key: DicomTagKey.PatientName,
+                    value: "Anonymized^Test",
+                },
+                {
+                    key: DicomTagKey.PatientBirthDate,
+                },
             ]);
-            if(anonymizedBuffer){
+            if (anonymizedBuffer) {
                 const anonymizedFile = new Blob([anonymizedBuffer]);
                 anonymizeFile({
                     index: current.index,
-                    anonymizedFile,
+                    anonymizedFile: anonymizedFile,
                 });
-                const data = await handleGetTagValue(anonymizedFile, [
-                    DicomDictionary.PatientName.name,
+                const data = await handleGetTags(anonymizedFile, [
+                    DicomTagKey.PatientName,
                 ]);
                 console.log('data:', data);
             }
@@ -57,10 +59,10 @@ export const AnonymizerPage = () => {
     const donwloadFilesHandler = (ids: string[]) => {
         const filesToDownload = anonymizedFiles?.filter(file => ids?.includes(file.index));
         if (!filesToDownload || filesToDownload?.length === 0) return false;
-        if(filesToDownload?.length === 1) {
+        if (filesToDownload?.length === 1) {
             const current = filesToDownload[0];
             const anonymizedFile = current.anonymizedFile;
-            if(anonymizedFile){
+            if (anonymizedFile) {
                 downloadFileToBrowser(anonymizedFile, current.file.name);
                 downloadFile(current.index);
             }

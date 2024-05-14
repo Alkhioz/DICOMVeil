@@ -5,20 +5,34 @@
 * @param {string} modifications
 * @returns {Uint8Array}
 */
-export function modify_tag_value(buffer: Uint8Array, modifications: string): Uint8Array;
+export function update_tags(buffer: Uint8Array, modifications: string): Uint8Array;
+/**
+* @param {Uint8Array} buffer
+* @param {string} modifications
+* @returns {Uint8Array}
+*/
+export function remove_tags(buffer: Uint8Array, modifications: string): Uint8Array;
+/**
+* @param {Uint8Array} buffer
+* @param {string} modifications
+* @returns {Uint8Array}
+*/
+export function remove_update_tags(buffer: Uint8Array, modifications: string): Uint8Array;
 /**
 * @param {Uint8Array} buffer
 * @param {(string)[]} tags
 * @returns {string}
 */
-export function get_tag_value(buffer: Uint8Array, tags: (string)[]): string;
+export function get_tags(buffer: Uint8Array, tags: (string)[]): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly modify_tag_value: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly get_tag_value: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly update_tags: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly remove_tags: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly remove_update_tags: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly get_tags: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
