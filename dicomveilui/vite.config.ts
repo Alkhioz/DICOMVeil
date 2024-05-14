@@ -11,11 +11,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@component': path.resolve(__dirname, 'src/components'),
-      '@util': path.resolve(__dirname, 'src/utils'),
-      '@routes': path.resolve(__dirname, 'src/routes'),
-      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@components': path.resolve(__dirname, 'src/components'),
       '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@routes': path.resolve(__dirname, 'src/routes'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
     },
   },
 })

@@ -23,17 +23,17 @@
       "@components/*": [
         "./src/components/*"
       ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@routes/*": [
-        "./src/routes/*"
+      "@hooks/*": [
+        "./src/hooks/*"
       ],
       "@pages/*": [
         "./src/pages/*"
       ],
-      "@hooks/*": [
-        "./src/hooks/*"
+      "@routes/*": [
+        "./src/routes/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
       ],
     },
   },
