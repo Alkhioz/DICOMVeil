@@ -1,17 +1,78 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { FileAnonymizer } from "@components/file-anonymizer.component";
 import { FileUploader } from "@components/file-uploader.component";
 import { MainLayout } from "@components/layout/main-layout.component"
 import { TripleLayout } from "@components/layout/triple-layout.component";
-import { ProfileConfiguration } from "@components/profile-configuration.component";
+import { ProfileConfiguration, controlInputsRefType } from "@components/profile-configuration.component";
 import { fileStatus, useFiles } from "@hooks/useFiles.hook";
 import { v4 as uuidv4 } from 'uuid';
 import { downloadFileToBrowser } from "@utils/file-download.util";
 import JSZip from 'jszip';
 import { useDicom } from "@hooks/useDicom/useDicom.hook";
-import { DicomTagKey } from "@hooks/useDictionary/dictionary/dicom.dictionary";
+import { AnonymizationAction, DicomTag, DicomTagKey } from "@hooks/useDictionary/dictionary/dicom.dictionary";
+import { useDictionary } from "@hooks/useDictionary/useDictionary.hook";
 
 export const AnonymizerPage = () => {
+    const dictionary: Record<DicomTagKey, DicomTag> = useDictionary();
+    const dictionaryArray: DicomTag[] = useMemo(() =>
+        Object.keys(dictionary).map(key => dictionary[key as DicomTagKey]),
+        [dictionary]
+    );
+    const dummyAction: (DicomTag & { dummy: string })[] = useMemo(() =>
+        dictionaryArray.filter(
+            (tag: DicomTag) => tag.action === AnonymizationAction.DUMMY
+        ).map(tag =>
+            ({ ...tag, dummy: uuidv4()?.split('-')?.[0] })
+        ),
+        [dictionaryArray]
+    );
+    const zeroOrDummyAction: (DicomTag & { dummy: string })[] = useMemo(() =>
+        dictionaryArray.filter(
+            (tag: DicomTag) => tag.action === AnonymizationAction.ZERO_OR_DUMMY
+        ).map(tag =>
+            ({ ...tag, dummy: uuidv4()?.split('-')?.[0] })
+        ),
+        [dictionaryArray]
+    );
+    const removeAction = useMemo(() =>
+        dictionaryArray.filter(
+            (tag: DicomTag) => tag.action === AnonymizationAction.REMOVE
+        ),
+        [dictionaryArray]
+    );
+    const defaultData: controlInputsRefType = useMemo(() => {
+        let data: any = {};
+        for (const tag of dummyAction) {
+            data = {
+                ...data,
+                [tag.name]: {
+                    checked: true,
+                    input: tag.dummy
+                }
+            }
+        }
+        for (const tag of zeroOrDummyAction) {
+            data = {
+                ...data,
+                [tag.name]: {
+                    checked: true,
+                    input: tag.dummy
+                }
+            }
+        }
+        for (const tag of removeAction) {
+            data = {
+                ...data,
+                [tag.name]: {
+                    checked: true,
+                    input: undefined
+                }
+            }
+        }
+        return data;
+    }, [dummyAction, zeroOrDummyAction, removeAction]);
+
+    const controlInputsRef = useRef<controlInputsRefType>(defaultData);
     const { handleRemoveUpdateTags, handleGetTags } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
@@ -29,19 +90,16 @@ export const AnonymizerPage = () => {
         });
     }
 
+    const actions = Object.keys(defaultData)?.map((tag)=> ({
+        key: tag as DicomTagKey,
+        value: defaultData[tag]?.input,
+    }));
+
     const anonymizeFilesHandler = async (ids: string[]) => {
         const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
         if (!filesToAnonymize || filesToAnonymize?.length === 0) return false;
         for (const current of filesToAnonymize) {
-            const anonymizedBuffer = await handleRemoveUpdateTags(current.file, [
-                {
-                    key: DicomTagKey.PatientName,
-                    value: "Anonymized^Test",
-                },
-                {
-                    key: DicomTagKey.PatientBirthDate,
-                },
-            ]);
+            const anonymizedBuffer = await handleRemoveUpdateTags(current.file, actions);
             if (anonymizedBuffer) {
                 const anonymizedFile = new Blob([anonymizedBuffer]);
                 anonymizeFile({
@@ -91,7 +149,16 @@ export const AnonymizerPage = () => {
                         clearFiles={clearFiles}
                     />
                 }
-                mainContent={<ProfileConfiguration />}
+                mainContent={
+                    <ProfileConfiguration
+                        controlInputsRef={controlInputsRef}
+                        actions={{
+                            dummyAction,
+                            zeroOrDummyAction,
+                            removeAction,
+                        }}
+                    />
+                }
             />
         </MainLayout>
     );
