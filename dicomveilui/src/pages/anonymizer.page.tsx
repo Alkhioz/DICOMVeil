@@ -1,19 +1,25 @@
-import { useMemo, useRef, useState } from "react";
 import { FileAnonymizer } from "@components/file-anonymizer.component";
 import { FileUploader } from "@components/file-uploader.component";
-import { MainLayout } from "@components/layout/main-layout.component"
+import { MainLayout } from "@components/layout/main-layout.component";
 import { TripleLayout } from "@components/layout/triple-layout.component";
-import { ProfileConfiguration, controlInputsRefType } from "@components/profile-configuration.component";
-import { fileStatus, useFiles } from "@hooks/useFiles.hook";
-import { v4 as uuidv4 } from 'uuid';
-import { downloadFileToBrowser } from "@utils/file-download.util";
-import JSZip from 'jszip';
+import { LoadingScreen } from "@components/loading-screen.component";
+import { ProfileConfiguration } from "@components/profile-configuration.component";
 import { useDicom } from "@hooks/useDicom/useDicom.hook";
 import { AnonymizationAction, DicomTag, DicomTagKey } from "@hooks/useDictionary/dictionary/dicom.dictionary";
 import { useDictionary } from "@hooks/useDictionary/useDictionary.hook";
-import { LoadingScreen } from "@components/loading-screen.component";
+import { fileStatus, useFiles } from "@hooks/useFiles.hook";
+import { downloadFileToBrowser } from "@utils/file-download.util";
+import JSZip from 'jszip';
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from 'uuid';
 
 export const AnonymizerPage = () => {
+    const {
+        register,
+        setValue,
+        getValues,
+    } = useForm();
     const [loading, setLoading] = useState<boolean>(false);
     const dictionary: Record<DicomTagKey, DicomTag> = useDictionary();
     const dictionaryArray: DicomTag[] = useMemo(() =>
@@ -42,40 +48,8 @@ export const AnonymizerPage = () => {
         ),
         [dictionaryArray]
     );
-    const defaultData: controlInputsRefType = useMemo(() => {
-        let data: any = {};
-        for (const tag of dummyAction) {
-            data = {
-                ...data,
-                [tag.name]: {
-                    checked: true,
-                    input: tag.dummy
-                }
-            }
-        }
-        for (const tag of zeroOrDummyAction) {
-            data = {
-                ...data,
-                [tag.name]: {
-                    checked: true,
-                    input: tag.dummy
-                }
-            }
-        }
-        for (const tag of removeAction) {
-            data = {
-                ...data,
-                [tag.name]: {
-                    checked: true,
-                    input: undefined
-                }
-            }
-        }
-        return data;
-    }, [dummyAction, zeroOrDummyAction, removeAction]);
 
-    const controlInputsRef = useRef<controlInputsRefType>(defaultData);
-    const { handleRemoveUpdateTags, handleGetTags } = useDicom();
+    const { handleRemoveUpdateTags } = useDicom();
     const { files, addFile, removeFile, anonymizeFile, downloadFile, clearFiles } = useFiles();
     const newFiles = useMemo(() =>
         files?.filter(file => file.status === fileStatus.UPLOADED)
@@ -92,12 +66,21 @@ export const AnonymizerPage = () => {
         });
     }
 
-    const actions = Object.keys(defaultData)?.map((tag) => ({
-        key: tag as DicomTagKey,
-        value: defaultData[tag]?.input,
-    }));
-
     const anonymizeFilesHandler = async (ids: string[]) => {
+        const formValues = getValues();
+        const allKeys = Object.keys(formValues)
+            ?.filter(key =>
+                key?.split('-')?.[1] === 'check'
+            );
+        const validKeys = allKeys?.filter(key=> formValues?.[key]);
+        const actions = validKeys?.map((key)=>{
+            const tag = key?.split('-')?.[0] as DicomTagKey;
+            const value = formValues?.[`${tag}-input`];
+            return {
+                key: tag,
+                value
+            }
+        });
         try {
             setLoading(true);
             const filesToAnonymize = newFiles?.filter(file => ids?.includes(file.index));
@@ -110,10 +93,6 @@ export const AnonymizerPage = () => {
                         index: current.index,
                         anonymizedFile: anonymizedFile,
                     });
-                    const data = await handleGetTags(anonymizedFile, [
-                        DicomTagKey.PatientName,
-                    ]);
-                    console.log('data:', data);
                 }
             }
             setLoading(false);
@@ -171,7 +150,8 @@ export const AnonymizerPage = () => {
                 }
                 mainContent={
                     <ProfileConfiguration
-                        controlInputsRef={controlInputsRef}
+                        register={register}
+                        setValue={setValue}
                         actions={{
                             dummyAction,
                             zeroOrDummyAction,
@@ -182,7 +162,7 @@ export const AnonymizerPage = () => {
             />
             {
                 loading ? (
-                   <LoadingScreen />
+                    <LoadingScreen />
                 ) : null
             }
         </MainLayout>

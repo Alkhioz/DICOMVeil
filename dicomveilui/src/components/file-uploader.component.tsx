@@ -46,10 +46,10 @@ export const FileUploader = (props: FileUploaderProps) => {
                 onChange={handleFileChange}
             />
             <button
-                className="p-2 gap-2 w-full h-full grid grid-rows-2 select-none hover:scale-105"
+                className="p-2 gap-4 w-full h-full grid grid-rows-2 select-none hover:scale-105"
                 onClick={handleFileInputClick}
             >
-                <img className="w-full h-full" src="/assets/upload_icon.svg" alt="upload item" />
+                <i className="fa fa-upload text-3xl" aria-hidden="true"></i>
                 Upload Images
             </button>
         </div>
