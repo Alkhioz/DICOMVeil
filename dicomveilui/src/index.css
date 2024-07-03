@@ -235,3 +235,22 @@ button {
   visibility: visible;
   opacity: 1;
 }
+
+::-webkit-scrollbar {
+  width: .5rem;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: rgb(29, 78, 216); 
+  border-radius: 10px;
+  min-height: 3rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(13, 35, 98); 
+}
