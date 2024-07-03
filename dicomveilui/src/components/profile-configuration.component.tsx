@@ -44,7 +44,7 @@ export const ProfileConfiguration = ({
                         <div className="absolute w-full h-full overflow-y-scroll grid grid-cols-1 gap-4 p-4">
                             {
                                 dummyAction?.map((action) => (
-                                    <div key={action.name} className="flex gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
+                                    <div key={action.name} className="flex flex-wrap gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
                                         <label
                                             htmlFor={`${action.name}-input`}
                                             className="flex-grow"
@@ -52,7 +52,7 @@ export const ProfileConfiguration = ({
                                         <input
                                             type="text"
                                             id={`${action.name}-input`}
-                                            className="text-black h-fit rounded-lg px-2"
+                                            className="text-black h-fit rounded-lg px-2 w-full max-w-52"
                                             {...register(`${action.name}-input`)}
                                         />
                                         <input
@@ -73,7 +73,7 @@ export const ProfileConfiguration = ({
                         <div className="absolute w-full h-full overflow-y-scroll grid grid-cols-1 gap-4 p-4">
                             {
                                 zeroOrDummyAction?.map((action) => (
-                                    <div key={action.name} className="flex gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
+                                    <div key={action.name} className="flex flex-wrap gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
                                         <label
                                             htmlFor={`${action.name}-input`}
                                             className="flex-grow"
@@ -81,7 +81,7 @@ export const ProfileConfiguration = ({
                                         <input
                                             type="text"
                                             id={`${action.name}-input`}
-                                            className="text-black h-fit rounded-lg px-2"
+                                            className="text-black h-fit rounded-lg px-2 w-full max-w-52"
                                             {...register(`${action.name}-input`)}
                                         />
                                         <input
@@ -102,7 +102,7 @@ export const ProfileConfiguration = ({
                         <div className="absolute w-full h-full overflow-y-scroll grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
                             {
                                 removeAction?.map((action) => (
-                                    <div key={action.name} className="flex gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
+                                    <div key={action.name} className="flex flex-wrap gap-2 w-full h-fit p-4 border border-blue-700 rounded-lg">
                                         <label
                                             htmlFor={action.name}
                                             className="flex-grow"

@@ -46,11 +46,13 @@ export const FileUploader = (props: FileUploaderProps) => {
                 onChange={handleFileChange}
             />
             <button
-                className="p-2 gap-4 w-full h-full grid grid-rows-2 select-none hover:scale-105"
+                className="p-2 w-full h-full select-none hover:scale-105"
                 onClick={handleFileInputClick}
             >
-                <i className="fa fa-upload text-3xl" aria-hidden="true"></i>
-                Upload Images
+                <div className="grid auto-rows-min gap-4">
+                    <i className="fa fa-upload text-3xl" aria-hidden="true"></i>
+                    Upload Images
+                </div>
             </button>
         </div>
     );
