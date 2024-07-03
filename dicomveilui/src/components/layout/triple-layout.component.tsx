@@ -63,7 +63,7 @@ export const TripleLayout: React.FC<LayoutProps> = ({ sidebarTop, sidebarBottom,
     return (
         <div className="h-full w-full grid grid-cols-1 grid-rows-[auto,1fr,1fr] md:grid-cols-[auto,1fr] md:grid-rows-[auto,1fr] border border-blue-700">
             <div
-                className={`w-full h-28 md:w-80 ${maximized === MaximizedElementEnum.SIDEBARTOP ? 'fixed top-0 left-0 w-full h-full z-40 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
+                className={`w-full h-28 md:w-80 ${maximized === MaximizedElementEnum.SIDEBARTOP ? 'fixed top-0 left-0 w-full h-full z-30 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
                     }`}
             >
                 {sidebarTop}
@@ -82,7 +82,7 @@ export const TripleLayout: React.FC<LayoutProps> = ({ sidebarTop, sidebarBottom,
                 />
             </div>
             <div
-                className={`w-full h-full md:row-span-2 ${maximized === MaximizedElementEnum.MAINCONTENT ? 'fixed top-0 left-0 w-full h-full z-40 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
+                className={`w-full h-full md:row-span-2 ${maximized === MaximizedElementEnum.MAINCONTENT ? 'fixed top-0 left-0 w-full h-full z-30 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
                     }`}
             >
                 {mainContent}
@@ -101,7 +101,7 @@ export const TripleLayout: React.FC<LayoutProps> = ({ sidebarTop, sidebarBottom,
                 />
             </div>
             <div
-                className={`w-full h-full md:w-80 ${maximized === MaximizedElementEnum.SIDEBARBOTTOM ? 'fixed top-0 left-0 w-full h-full z-40 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
+                className={`w-full h-full md:w-80 ${maximized === MaximizedElementEnum.SIDEBARBOTTOM ? 'fixed top-0 left-0 w-full h-full z-30 py-10 px-2 pb-20 bg-white text-black dark:bg-black dark:text-white' : 'relative'
                     }`}
             >
                 {sidebarBottom}
