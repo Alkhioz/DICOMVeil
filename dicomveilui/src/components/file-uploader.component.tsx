@@ -3,6 +3,7 @@ import JSZip from 'jszip';
 
 export type FileUploaderProps = {
     addFile: (file: File) => void;
+    postUploading: () => void;
 }
 
 const zipTypes = [
@@ -17,11 +18,18 @@ export const FileUploader = (props: FileUploaderProps) => {
     };
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event?.target?.files?.[0];
-        if (!file) return false;
+        if (!file) {
+            props.postUploading();
+            return false;
+        }
         if (!(zipTypes.includes(file.type))) {
-            if(!file.name.toLowerCase().endsWith('.dcm')) return false;
+            if(!file.name.toLowerCase().endsWith('.dcm')) {
+                props.postUploading();
+                return false;
+            }
             props.addFile(file);
             if (fileInputRef.current) fileInputRef.current.value = '';
+            props.postUploading();
             return false;
         }
         const zip = new JSZip();
@@ -29,13 +37,20 @@ export const FileUploader = (props: FileUploaderProps) => {
         contents.forEach(async (_, jsZipObject) => {
             if (!jsZipObject.dir) {
                 const blob = await jsZipObject.async("blob");
-                if (!blob) return false;
+                if (!blob) {
+                    props.postUploading();
+                    return false;
+                }
                 const file = new File([blob], jsZipObject.name, { type: blob.type });
-                if (!file) return false;
+                if (!file) {
+                    props.postUploading();
+                    return false;
+                }
                 props.addFile(file);
             }
         });
         if (fileInputRef.current) fileInputRef.current.value = '';
+        props.postUploading();
     };
     return (
         <div className="p-4 w-full h-full border border-blue-700">

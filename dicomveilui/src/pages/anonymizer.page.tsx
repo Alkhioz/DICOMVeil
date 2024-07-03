@@ -14,7 +14,14 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
 
+export enum MaximizedElementEnum {
+    SIDEBARTOP = 'SIDEBARTOP',
+    SIDEBARBOTTOM = 'SIDEBARBOTTOM',
+    MAINCONTENT = 'MAINCONTENT'
+}
+
 export const AnonymizerPage = () => {
+    const [maximized, setMaximized] = useState<MaximizedElementEnum | null>(null);
     const {
         register,
         setValue,
@@ -72,8 +79,8 @@ export const AnonymizerPage = () => {
             ?.filter(key =>
                 key?.split('-')?.[1] === 'check'
             );
-        const validKeys = allKeys?.filter(key=> formValues?.[key]);
-        const actions = validKeys?.map((key)=>{
+        const validKeys = allKeys?.filter(key => formValues?.[key]);
+        const actions = validKeys?.map((key) => {
             const tag = key?.split('-')?.[0] as DicomTagKey;
             const value = formValues?.[`${tag}-input`];
             return {
@@ -138,7 +145,17 @@ export const AnonymizerPage = () => {
     return (
         <MainLayout>
             <TripleLayout
-                sidebarTop={<FileUploader addFile={addNewFile} />}
+                maximized={maximized}
+                setMaximized={setMaximized}
+                sidebarTop={
+                    <FileUploader
+                        addFile={addNewFile}
+                        postUploading={() => {
+                            if (maximized !== null) {
+                                setMaximized(null);
+                            }
+                        }}
+                    />}
                 sidebarBottom={
                     <FileAnonymizer
                         files={files}
