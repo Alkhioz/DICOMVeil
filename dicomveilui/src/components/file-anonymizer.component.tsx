@@ -9,6 +9,10 @@ export type FileAnonymizerProps = {
 }
 
 export const FileAnonymizer = (props: FileAnonymizerProps) => {
+    const hasFilesToAnonymize = props?.files
+        ?.filter(file =>
+            file.status === fileStatus.UPLOADED
+        )?.length > 0;
     const handleAnonymization = () => {
         const filesToAnonymize = props?.files
             ?.filter(file => file.status === fileStatus.UPLOADED)
@@ -20,6 +24,13 @@ export const FileAnonymizer = (props: FileAnonymizerProps) => {
             ?.filter(file => file.status === fileStatus.ANONYMIZED)
             ?.map(file => file.index);
         props.downloadFiles(filesToDonwload);
+    }
+    const handleDelete = () => {
+        const filesToDelete = props?.files
+            ?.map(file => file.index);
+        for (const id of filesToDelete) {
+            props.removeFile(id);
+        }
     }
     return (
         <div className="p-4 w-full h-full border border-blue-700 grid grid-rows-[1fr,auto]">
@@ -58,12 +69,15 @@ export const FileAnonymizer = (props: FileAnonymizerProps) => {
                                         <i className="fa fa-user-secret" aria-hidden="true"></i>
                                     </button>
                                     <button
-                                        disabled={current.status !== fileStatus.ANONYMIZED}
+                                        disabled={
+                                            ![fileStatus.ANONYMIZED, fileStatus.DOWNLOADED].includes(current.status)
+                                        }
                                         type="button"
-                                        className={`w-7 h-7 grid grid-cols-1 justify-items-center items-center rounded-full bg-blue-700 text-white p-1 ${current.status !== fileStatus.ANONYMIZED ? 'opacity-50' : ''
+                                        className={`w-7 h-7 grid grid-cols-1 justify-items-center items-center rounded-full bg-blue-700 text-white p-1 ${![fileStatus.ANONYMIZED, fileStatus.DOWNLOADED].includes(current.status)
+                                            ? 'opacity-50' : ''
                                             }`}
                                         onClick={
-                                            current.status !== fileStatus.ANONYMIZED ? () => { }
+                                            ![fileStatus.ANONYMIZED, fileStatus.DOWNLOADED].includes(current.status) ? () => { }
                                                 : () => {
                                                     props.downloadFiles([current.index]);
                                                 }
@@ -88,18 +102,28 @@ export const FileAnonymizer = (props: FileAnonymizerProps) => {
             </div>
             <div>
                 <button
-                    className="w-full p-4 bg-blue-700  text-white my-2 flex gap-2 rounded-lg justify-center items-center"
-                    onClick={handleAnonymization}
+                    disabled={props.files?.length === 0 || !hasFilesToAnonymize}
+                    className={`w-full px-4 py-2 bg-blue-700  text-white my-2 flex gap-2 rounded-lg justify-center items-center ${props.files?.length === 0 || !hasFilesToAnonymize ? 'opacity-50' : ''}`}
+                    onClick={props.files?.length === 0 || !hasFilesToAnonymize ? () => { } : handleAnonymization}
                 >
                     <span className="text-xl">Anonymize All</span>
                     <i className="fa fa-user-secret" aria-hidden="true"></i>
                 </button>
                 <button
-                    className="w-full p-4 bg-blue-700 text-white my-2 flex gap-2 rounded-lg justify-center items-center"
-                    onClick={handleDownload}
+                    disabled={props.files?.length === 0}
+                    className={`w-full px-4 py-2 bg-blue-700  text-white my-2 flex gap-2 rounded-lg justify-center items-center ${props.files?.length === 0 ? 'opacity-50' : ''}`}
+                    onClick={props.files?.length === 0 ? () => { } : handleDownload}
                 >
                     <span className="text-xl">Dowload All</span>
                     <i className="fa fa-download" aria-hidden="true"></i>
+                </button>
+                <button
+                    disabled={props.files?.length === 0}
+                    className={`w-full px-4 py-2 bg-blue-700  text-white my-2 flex gap-2 rounded-lg justify-center items-center ${props.files?.length === 0 ? 'opacity-50' : ''}`}
+                    onClick={props.files?.length === 0 ? () => { } : handleDelete}
+                >
+                    <span className="text-xl">Delete All</span>
+                    <i className="fa fa-trash" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
