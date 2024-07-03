@@ -26,19 +26,61 @@ export const FileAnonymizer = (props: FileAnonymizerProps) => {
             <div className="relative">
                 <div className="absolute w-full h-full overflow-y-scroll">
                     {
-                        props.files?.map((current) =>
+                        props.files?.map((current, idx) =>
                             <div
                                 className="p-2 px-4 flex gap-2"
                                 key={current.index}
                             >
-                                <div className="flex-grow">{current.file.name}</div>
-                                <button
-                                    type="button"
-                                    className="px-4 rounded-md bg-blue-700  text-white"
-                                    onClick={()=>{
-                                        props.removeFile(current.index);
-                                    }}
-                                >X</button>
+                                <div className="flex-grow tooltip">
+                                    <div className="md:overflow-hidden md:text-ellipsis md:text-nowrap md:max-w-32">
+                                        {current.file.name}
+                                    </div>
+                                    <span
+                                        className={
+                                            idx == 0 ? "tooltiptextbottom" : "tooltiptext"
+                                        }>
+                                        {current.file.name}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 items-center">
+                                    <button
+                                        disabled={current.status !== fileStatus.UPLOADED}
+                                        type="button"
+                                        className={`relative w-7 h-7 grid grid-cols-1 justify-items-center items-center rounded-full bg-blue-700 text-white p-1 ${current.status !== fileStatus.UPLOADED ? 'opacity-50' : ''
+                                            }`}
+                                        onClick={
+                                            current.status !== fileStatus.UPLOADED ? () => { }
+                                                : () => {
+                                                    props.anonymizeFiles([current.index]);
+                                                }
+                                        }
+                                    >
+                                        <i className="fa fa-user-secret" aria-hidden="true"></i>
+                                    </button>
+                                    <button
+                                        disabled={current.status !== fileStatus.ANONYMIZED}
+                                        type="button"
+                                        className={`w-7 h-7 grid grid-cols-1 justify-items-center items-center rounded-full bg-blue-700 text-white p-1 ${current.status !== fileStatus.ANONYMIZED ? 'opacity-50' : ''
+                                            }`}
+                                        onClick={
+                                            current.status !== fileStatus.ANONYMIZED ? () => { }
+                                                : () => {
+                                                    props.downloadFiles([current.index]);
+                                                }
+                                        }
+                                    >
+                                        <i className="fa fa-download" aria-hidden="true"></i>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="w-7 h-7 grid grid-cols-1 justify-items-center items-center rounded-full bg-blue-700 text-white p-1 text-sm"
+                                        onClick={() => {
+                                            props.removeFile(current.index);
+                                        }}
+                                    >
+                                        <i className="fa fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
                             </div>
                         )
                     }
@@ -46,13 +88,19 @@ export const FileAnonymizer = (props: FileAnonymizerProps) => {
             </div>
             <div>
                 <button
-                    className="w-full block p-4 bg-blue-700  text-white my-2"
+                    className="w-full p-4 bg-blue-700  text-white my-2 flex gap-2 rounded-lg justify-center items-center"
                     onClick={handleAnonymization}
-                >Anonymize All</button>
+                >
+                    <span className="text-xl">Anonymize All</span>
+                    <i className="fa fa-user-secret" aria-hidden="true"></i>
+                </button>
                 <button
-                    className="w-full block p-4 bg-blue-700 text-white my-2"
+                    className="w-full p-4 bg-blue-700 text-white my-2 flex gap-2 rounded-lg justify-center items-center"
                     onClick={handleDownload}
-                >Dowload All</button>
+                >
+                    <span className="text-xl">Dowload All</span>
+                    <i className="fa fa-download" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     );
