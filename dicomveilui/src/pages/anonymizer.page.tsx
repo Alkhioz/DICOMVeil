@@ -128,8 +128,11 @@ export const AnonymizerPage = () => {
         }
         const zip = new JSZip();
         for (const current of filesToDownload) {
-            zip.file(current.file.name, current.file);
-            downloadFile(current.index);
+            const anonymizedFile = current.anonymizedFile;
+            if (anonymizedFile) {
+                zip.file(current.file.name, anonymizedFile);
+                downloadFile(current.index);
+            }
         }
         zip.generateAsync({ type: "blob" }).then((content) => {
             downloadFileToBrowser(content, `anonymized_dicom_${Date.now()}.zip`);
